@@ -1,27 +1,22 @@
-Industrial Worker Safety Monitoring System
-Live Dashboard
+# Industrial Worker Safety Monitoring System
 
-https://wearable-suite-for-industrial-workers-mx4qgznc8pvbmsfej5dudx.streamlit.app/
+**Live Dashboard:** [https://wearable-suite-for-industrial-workers-mx4qgznc8pvbmsfej5dudx.streamlit.app/](https://wearable-suite-for-industrial-workers-mx4qgznc8pvbmsfej5dudx.streamlit.app/)
 
-Overview
+## Overview
 
-The Industrial Worker Safety Monitoring System is a real-time IoT platform designed to ensure worker safety by continuously monitoring critical health and environmental parameters through a wearable ESP32-based device.
+The Industrial Worker Safety Monitoring System is a real-time IoT platform designed to ensure worker safety by continuously monitoring critical health and environmental parameters through a wearable ESP32-based device. The system integrates sensors for temperature, humidity, heart rate, motion, gas, and radiation detection. Data is transmitted securely to a cloud-based Streamlit dashboard using MQTT for real-time visualization, alerting, and analytics.
 
-The system integrates sensors for temperature, humidity, heart rate, motion, gas, and radiation detection. Data is transmitted securely to a cloud-based Streamlit dashboard using MQTT for real-time visualization, alerting, and analytics.
+## Features
 
-Features
+- Multi-sensor integration: DS18B20 (body temperature), MQ-35 (gas), MPU6050 (motion/fall), MAX30102 (heart rate/SpO₂), and GQ GMC-320 Plus (radiation)
+- Real-time monitoring: Streams live sensor readings via MQTT (broker.emqx.io) to the dashboard every 2 seconds
+- Smart hazard detection: On-device threshold evaluation triggers alerts for gas leaks, high temperature, radiation exposure, or worker falls
+- Interactive dashboard: Streamlit-based monitoring interface with alert visualization, historical logs, and statistics
+- Scalable and modular: Works on local setups, simulation (WokWi), or physical deployments
 
-Multi-sensor integration: DS18B20 (body temperature), MQ-35 (gas), MPU6050 (motion/fall), MAX30102 (heart rate/SpO₂), and GQ GMC-320 Plus (radiation).
+## System Architecture
 
-Real-time monitoring: Streams live sensor readings via MQTT (broker.emqx.io) to the dashboard every 2 seconds.
-
-Smart hazard detection: On-device threshold evaluation triggers alerts for gas leaks, high temperature, radiation exposure, or worker falls.
-
-Interactive dashboard: Streamlit-based monitoring interface with alert visualization, historical logs, and statistics.
-
-Scalable and modular: Works on local setups, simulation (WokWi), or physical deployments.
-
-System Architecture
+```
 +---------------------------+      MQTT Broker      +-----------------------------+
 |      ESP32 Wearable       | ---> broker.emqx.io -->|  Streamlit Web Dashboard    |
 |---------------------------|                       |-----------------------------|
@@ -31,16 +26,23 @@ System Architecture
 | MPU6050  : Motion/Fall    |                       | Data Visualization & Logs    |
 | GMC-320+ : Radiation      |                       | Downloadable Data Reports    |
 +---------------------------+                       +-----------------------------+
+```
 
-Technology Stack
+## Technology Stack
 
-Hardware: ESP32, DS18B20, MQ-35, MPU6050, MAX30102, GQ GMC-320 Plus
-Software: Arduino IDE, WokWi Simulator
-Protocols: MQTT, JSON, Wi-Fi (802.11)
-Backend: Paho MQTT, Python
-Frontend: Streamlit Dashboard (Dark Mode UI)
+**Hardware:** ESP32, DS18B20, MQ-35, MPU6050, MAX30102, GQ GMC-320 Plus
 
-Repository Structure
+**Software:** Arduino IDE, WokWi Simulator
+
+**Protocols:** MQTT, JSON, Wi-Fi (802.11)
+
+**Backend:** Paho MQTT, Python
+
+**Frontend:** Streamlit Dashboard (Dark Mode UI)
+
+## Repository Structure
+
+```
 Industrial-Worker-Safety/
 │
 ├── esp32_firmware/
@@ -52,61 +54,56 @@ Industrial-Worker-Safety/
 ├── requirements.txt                   # Python dependencies
 ├── README.md                          # Documentation
 └── LICENSE                            # Optional license
+```
 
-Setup and Installation
-1. ESP32 Firmware
+## Setup and Installation
 
-Open the .ino file in Arduino IDE or WokWi.
+### 1. ESP32 Firmware
 
-Configure Wi-Fi credentials and MQTT broker (default: broker.emqx.io, port 1883).
+- Open the `.ino` file in Arduino IDE or WokWi
+- Configure Wi-Fi credentials and MQTT broker (default: broker.emqx.io, port 1883)
+- Upload to ESP32 or run simulation using WokWi
 
-Upload to ESP32 or run simulation using WokWi
-.
-
-2. Python Dashboard
+### 2. Python Dashboard
 
 Clone this repository:
-
+```bash
 git clone https://github.com/A-Square8/Smart-Suit-for-Industrial-Workers.git
 cd Smart-Suit-for-Industrial-Workers/dashboard
-
+```
 
 Install dependencies:
-
+```bash
 pip install -r requirements.txt
-
+```
 
 Run the Streamlit dashboard:
-
+```bash
 streamlit run app.py
+```
 
-How It Works
+## How It Works
 
-ESP32 collects sensor data (temperature, heart rate, gas, radiation, motion).
+1. ESP32 collects sensor data (temperature, heart rate, gas, radiation, motion)
+2. MQTT client publishes data to topic `worker/safety/data`
+3. Dashboard subscribes to both `worker/safety/data` and `worker/safety/alert`
+4. Hazard conditions trigger alerts, stored and visualized on the Streamlit dashboard
+5. Data analytics module computes averages, max/min, and summary statistics
 
-MQTT client publishes data to topic worker/safety/data.
+## Alert Conditions
 
-Dashboard subscribes to both worker/safety/data and worker/safety/alert.
+| Parameter | Sensor | Condition for Alert |
+|-----------|--------|---------------------|
+| Body Temperature | DS18B20 | > 38.5 °C |
+| Gas Level | MQ-35 | > 500 PPM |
+| Heart Rate | MAX30102 | > 110 BPM |
+| Radiation Level | GQ GMC-320 Plus | > 1.0 µSv/h |
+| Fall Detection | MPU6050 | Sudden acceleration change |
 
-Hazard conditions trigger alerts, stored and visualized on the Streamlit dashboard.
+## Example Output
 
-Data analytics module computes averages, max/min, and summary statistics.
-
-Alert Conditions
-Parameter	Sensor	Condition for Alert
-Body Temperature	DS18B20	> 38.5 °C
-Gas Level	MQ-35	> 500 PPM
-Heart Rate	MAX30102	> 110 BPM
-Radiation Level	GQ GMC-320 Plus	> 1.0 µSv/h
-Fall Detection	MPU6050	Sudden acceleration change
-Example Output
-
-Metrics Displayed:
-
-Worker Status: Normal / Critical
-
-Body Temperature, Heart Rate, Gas PPM, Radiation µSv/h
-
-Alerts History Log
-
-Statistical Summary (Average, Max)
+**Metrics Displayed:**
+- Worker Status: Normal / Critical
+- Body Temperature, Heart Rate, Gas PPM, Radiation µSv/h
+- Alerts History Log
+- Statistical Summary (Average, Max)
